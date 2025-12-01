@@ -1,13 +1,10 @@
 module Main where
 
-import Debug.Trace
-
 main :: IO ()
 main = do
   puzzleContents <- readFile "puzzle.txt"
   let (_, a, b) = solve puzzleContents
-  print a
-  print b
+  print (a, b)
 
 solve :: String -> (Int, Int, Int)
 solve input = foldl moveDail (50, 0, 0) $ map parseLine $ filter (/= "") $ lines input
@@ -30,6 +27,7 @@ movedOverZero position v
   | position == 0 = clicks
   | remainder < 0 = clicks + if position + remainder < 0 then 1 else 0
   | remainder > 0 = clicks + if position + remainder > 100 then 1 else 0
+  | otherwise = error "unreachable"
   where
     remainder = v `rem` 100
     clicks = abs (v `quot` 100)

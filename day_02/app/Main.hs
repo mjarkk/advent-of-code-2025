@@ -17,7 +17,7 @@ split :: String -> Char -> [String]
 split "" _ = [""]
 split (x : xs) needle
   | x == needle = "" : sets
-  | otherwise = (x : head sets) : tail sets
+  | otherwise = (x : sets !! 0) : drop 1 sets
   where
     sets = split xs needle
 
@@ -31,10 +31,7 @@ solve :: String -> (Int, Int)
 solve puzzleContents = foldl solveSection (0, 0) $ parse puzzleContents
 
 solveSection :: (Int, Int) -> (Int, Int) -> (Int, Int)
-solveSection acc (from, to) = foldl countRepeatingRanges acc [from .. to]
-
-countRepeatingRanges :: (Int, Int) -> Int -> (Int, Int)
-countRepeatingRanges (a,b) num = (countRepeatingRangesPart1 a num, countRepeatingRangesPart2 b num)
+solveSection acc (from, to) = foldl (\(a,b) num -> (countRepeatingRangesPart1 a num, countRepeatingRangesPart2 b num)) acc [from .. to]
 
 countRepeatingRangesPart1 :: Int -> Int -> Int
 countRepeatingRangesPart1 acc num

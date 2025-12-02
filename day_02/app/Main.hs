@@ -1,9 +1,15 @@
 module Main where
 
+import System.CPUTime
+
 main :: IO ()
 main = do
+  start <- getCPUTime
   puzzleContents <- readFile "puzzle.txt"
   print $ solve puzzleContents
+  end <- getCPUTime
+  let diff = round (fromIntegral (end - start) / 1000000000 :: Double)
+  putStrLn ("Execution time: " ++ show diff ++ " ms")
 
 parse :: String -> [(Int, Int)]
 parse input = map parseSection $ split (removeChar input '\n') ','
@@ -31,16 +37,16 @@ solve :: String -> (Int, Int)
 solve puzzleContents = foldl solveSection (0, 0) $ parse puzzleContents
 
 solveSection :: (Int, Int) -> (Int, Int) -> (Int, Int)
-solveSection acc (from, to) = foldl (\(a,b) num -> (countRepeatingRangesPart1 a num, countRepeatingRangesPart2 b num)) acc [from .. to]
+solveSection acc (from, to) = foldl (\(a, b) num -> (countRepeatingRangesPart1 a num, countRepeatingRangesPart2 b num)) acc [from .. to]
 
 countRepeatingRangesPart1 :: Int -> Int -> Int
 countRepeatingRangesPart1 acc num
   | length str `mod` 2 == 1 = acc
   | otherwise =
-        let rangeToCheck = length str `div` 2
-            rangeAndRemainder = splitAt rangeToCheck str
-            repeats = uncurry rangeRepeats rangeAndRemainder
-         in acc + if repeats then read str else 0
+      let rangeToCheck = length str `div` 2
+          rangeAndRemainder = splitAt rangeToCheck str
+          repeats = uncurry rangeRepeats rangeAndRemainder
+       in acc + if repeats then read str else 0
   where
     str = show num
 
@@ -48,7 +54,7 @@ countRepeatingRangesPart2 :: Int -> Int -> Int
 countRepeatingRangesPart2 acc num =
   let str = show num
       l = length str
-      rangesToCheck = filter (\range -> l `mod` range == 0) [1..length str `div` 2]
+      rangesToCheck = filter (\range -> l `mod` range == 0) [1 .. length str `div` 2]
       repeats = any (\range -> uncurry rangeRepeats $ splitAt range str) rangesToCheck
    in acc + if repeats then read str else 0
 

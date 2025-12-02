@@ -1,7 +1,5 @@
 module Main where
 
-import Debug.Trace
-
 main :: IO ()
 main = do
   puzzleContents <- readFile "puzzle.txt"

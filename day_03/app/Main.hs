@@ -1,15 +1,9 @@
 module Main where
 
-import System.CPUTime
-
 main :: IO ()
 main = do
-  start <- getCPUTime
   puzzleContents <- readFile "puzzle.txt"
   print $ solve puzzleContents
-  end <- getCPUTime
-  let diff = (fromIntegral (end - start) / 1000000000 :: Double)
-  putStrLn ("Execution time: " ++ show diff ++ " ms")
 
 parse :: String -> [[Int]]
 parse input = map (map (\c -> read [c])) $ filter (/= "") $ lines input

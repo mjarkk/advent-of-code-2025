@@ -1,9 +1,7 @@
 module Main where
 
 main :: IO ()
-main = do
-  puzzleContents <- readFile "puzzle.txt"
-  print $ solve puzzleContents
+main = print . solve =<< readFile "puzzle.txt"
 
 parse :: String -> [[Int]]
 parse input = map (map (\c -> read [c])) $ filter (/= "") $ lines input

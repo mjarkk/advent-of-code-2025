@@ -9,14 +9,14 @@ main = do
   puzzleContents <- readFile "puzzle.txt"
   print $ solve puzzleContents
   end <- getCPUTime
-  let diff = round (fromIntegral (end - start) / 1000000000 :: Double)
+  let diff = (fromIntegral (end - start) / 1000000000 :: Double)
   putStrLn ("Execution time: " ++ show diff ++ " ms")
 
 solve :: String -> (Int, Int)
 solve input =
   let warehouse = filter (/= "") $ lines input
       mapHeight = length warehouse
-      mapWidth = length $ head warehouse
+      mapWidth = length $ warehouse !! 0
       warehouseArray = listArray ((0, 0), (mapHeight - 1, mapWidth - 1)) [c | row <- warehouse, c <- row] :: UArray (Int, Int) Char
    in solveR warehouseArray mapHeight mapWidth
 
@@ -33,10 +33,11 @@ solveR warehouse mapHeight mapWidth =
 canRemoveRollOfPaper :: UArray (Int, Int) Char -> (Int, Int) -> Bool
 canRemoveRollOfPaper warehouse (x, y) =
   let neighbors = [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1), (x - 1, y - 1), (x + 1, y - 1), (x - 1, y + 1), (x + 1, y + 1)]
-      neighborValues = foldl (\acc (x', y') -> if isRolOfPaper warehouse (x', y') then acc + 1 else acc) 0 neighbors
+      neighborValues = foldl (\acc (x', y') -> acc + isRolOfPaper warehouse (x', y')) 0 neighbors
    in neighborValues < 4
 
-isRolOfPaper :: UArray (Int, Int) Char -> (Int, Int) -> Bool
-isRolOfPaper warehouse (x, y) =
-  let ((minX, minY), (maxX, maxY)) = bounds warehouse
-   in x >= minX && x <= maxX && y >= minY && y <= maxY && warehouse ! (x, y) == '@'
+isRolOfPaper :: UArray (Int, Int) Char -> (Int, Int) -> Int
+isRolOfPaper warehouse (x, y)
+  | x >= minX && x <= maxX && y >= minY && y <= maxY && warehouse ! (x, y) == '@' = 1
+  | otherwise = 0
+  where ((minX, minY), (maxX, maxY)) = bounds warehouse

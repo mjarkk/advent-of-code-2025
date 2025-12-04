@@ -38,6 +38,6 @@ canRemoveRollOfPaper warehouse (x, y) =
 
 isRolOfPaper :: UArray (Int, Int) Char -> (Int, Int) -> Int
 isRolOfPaper warehouse (x, y)
-  | x >= minX && x <= maxX && y >= minY && y <= maxY && warehouse ! (x, y) == '@' = 1
+  | x >= minX && x <= maxX && y >= minY && y <= maxY && warehouse ! (y, x) == '@' = 1
   | otherwise = 0
   where ((minX, minY), (maxX, maxY)) = bounds warehouse

@@ -1,7 +1,7 @@
 module Main where
 
-import System.CPUTime
 import Debug.Trace
+import System.CPUTime
 
 main :: IO ()
 main = do
@@ -17,28 +17,22 @@ solve input =
   let warehouse = filter (/= "") $ lines input
       mapHeight = length warehouse
       mapWidth = length (head warehouse)
-      answerP1 = foldl (\baseAcc y -> foldl (\acc x -> if canRemoveRollOfPaper warehouse (x, y) then acc + 1 else acc) baseAcc [0 .. mapWidth - 1]) 0 [0 .. mapHeight - 1]
-   in (answerP1, solveP2 warehouse mapHeight mapWidth)
+   in solveR warehouse mapHeight mapWidth
 
-solveP2 :: [String] -> Int -> Int -> Int
-solveP2 warehouse mapHeight mapWidth =
-  let toRemove = foldl (\baseAcc y -> foldl (\acc x -> if canRemoveRollOfPaper warehouse (x, y) then (x, y) : acc else acc) baseAcc [0 .. mapWidth - 1]) [] [0 .. mapHeight - 1]
-   in if length toRemove > 0 then length toRemove + solveP2 (removeFromMap warehouse toRemove) mapHeight mapWidth else 0
+solveR :: [String] -> Int -> Int -> (Int, Int)
+solveR warehouse mapHeight mapWidth =
+  let toRemove = map (\(row, y) -> map (\(c, x) -> c == '@' && canRemoveRollOfPaper warehouse (x, y)) $ zip row [0 .. mapWidth - 1]) $ zip warehouse [0 .. mapHeight - 1]
+      totalRemoved = foldl (\acc x -> if x then acc + 1 else acc) 0 $ concat toRemove
+   in (totalRemoved, if totalRemoved > 0 then totalRemoved + snd (solveR (removeFromMap warehouse toRemove) mapHeight mapWidth) else 0)
 
-removeFromMap :: [String] -> [(Int, Int)] -> [String]
-removeFromMap warehouse [] = warehouse
-removeFromMap warehouse ((x, y):xs) =
-  let row = warehouse !! y
-      newRow = take x row ++ '.' : drop (x + 1) row
-   in removeFromMap (take y warehouse ++ [newRow] ++ drop (y + 1) warehouse) xs
+removeFromMap :: [String] -> [[Bool]] -> [String]
+removeFromMap warehouse toRemove = map (\(mapRow, removeRow) -> map (\(c, r) -> if r then '.' else c) $ zip mapRow removeRow) $ zip warehouse toRemove
 
 canRemoveRollOfPaper :: [String] -> (Int, Int) -> Bool
-canRemoveRollOfPaper warehouse (x, y)
-  | isRolOfPaper warehouse (x, y) =
-      let neighbors = [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1), (x - 1, y - 1), (x + 1, y - 1), (x - 1, y + 1), (x + 1, y + 1)]
-          neighborValues = foldl (\acc (x', y') -> if isRolOfPaper warehouse (x', y') then acc + 1 else acc) 0 neighbors
-       in neighborValues < 4
-  | otherwise = False
+canRemoveRollOfPaper warehouse (x, y) =
+    let neighbors = [(x - 1, y), (x + 1, y), (x, y - 1), (x, y + 1), (x - 1, y - 1), (x + 1, y - 1), (x - 1, y + 1), (x + 1, y + 1)]
+        neighborValues = foldl (\acc (x', y') -> if isRolOfPaper warehouse (x', y') then acc + 1 else acc) 0 neighbors
+     in neighborValues < 4
 
 isRolOfPaper :: [String] -> (Int, Int) -> Bool
 isRolOfPaper warehouse (x, y) = atMapPosition warehouse (x, y) == '@'

@@ -20,6 +20,6 @@ executable template
     main-is:          Main.hs
     -- other-modules:
     -- other-extensions:
-    build-depends:    base
+    build-depends:    base, array
     hs-source-dirs:   app
     default-language: GHC2024

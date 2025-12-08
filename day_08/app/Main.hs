@@ -48,8 +48,8 @@ createSets :: ([[(Int, Int, Int)]], (Int, Int, Int), (Int, Int, Int)) -> ((Int, 
 createSets ([], lastA, lastB) (a, b) = ([[a, b]], lastA, lastB)
 createSets (acc, lastA, lastB) (a, b)
   | aIdx == (-1) && bIdx == (-1) = ([a, b] : acc, lastA, lastB)
-  | aIdx == (-1) = (replaceIdx bIdx (a : (acc !! bIdx)) acc, lastA, lastB)
-  | bIdx == (-1) = (replaceIdx aIdx (b : (acc !! aIdx)) acc, lastA, lastB)
+  | aIdx == (-1) = (replaceIdx bIdx (a : (acc !! bIdx)) acc, a, b)
+  | bIdx == (-1) = (replaceIdx aIdx (b : (acc !! aIdx)) acc, a, b)
   | aIdx == bIdx = (acc, lastA, lastB)
   | aIdx /= bIdx =
       let newList = (acc !! aIdx) ++ (acc !! bIdx)

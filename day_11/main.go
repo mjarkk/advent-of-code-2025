@@ -8,7 +8,6 @@ import (
 )
 
 type Node struct {
-	Name          string
 	Links         []*Node
 	CachedResults map[*Node]int
 }
@@ -30,14 +29,14 @@ func main() {
 		name := nameAndChildren[0]
 		node := nodes[name]
 		if node == nil {
-			node = &Node{Name: name}
+			node = &Node{CachedResults: map[*Node]int{}}
 			nodes[name] = node
 		}
 
 		for childName := range strings.SplitSeq(nameAndChildren[1], " ") {
 			childNode := nodes[childName]
 			if childNode == nil {
-				childNode = &Node{Name: childName}
+				childNode = &Node{CachedResults: map[*Node]int{}}
 				nodes[childName] = childNode
 			}
 			node.Links = append(node.Links, childNode)
@@ -103,11 +102,6 @@ func (v *Visitor) FindOutsViaDac(node *Node, findNext *Node) int {
 		}
 	}
 
-	if node.CachedResults == nil {
-		node.CachedResults = map[*Node]int{findNext: resp}
-	} else {
-		node.CachedResults[findNext] = resp
-	}
-
+	node.CachedResults[findNext] = resp
 	return resp
 }
